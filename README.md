@@ -5,7 +5,7 @@
 
 #### Info
 
-A Lobbyswitcher for CloudNet v3
+A Webinterface for CloudNet v3
 
 #### Projectpage
 
