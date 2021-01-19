@@ -1,3 +1,7 @@
+# PLUGIN / WEBINTERFACE IST NICHT FERTIG GESTELLT.
+# DIE ENTWICKLUNG WURDE BIS AUF WEITERES EINGESTELLT.
+
+
 <img src="https://the-systems.eu/images/favicons/apple-touch-icon.png" width="60px" />
 
 # CloudNet3-Webinterface
