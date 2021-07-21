@@ -1,0 +1,21 @@
+{
+  "name": "the-systems/cloudnet3-webinterface",
+  "description": "a webinterface for cloudnet3 by the-systems",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Moritz Walter",
+      "email": "moritz.walter@the-systems.eu"
+    }
+  ],
+  "require": {
+    "nezamy/route": "*",
+    "ext-curl": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "webinterface\\": "src/webinterface/"
+    }
+  }
+}

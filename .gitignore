@@ -1,4 +1,10 @@
 .idea/
-*.iml
+.idea/*
+vendor/
+vendor/*
 
-dependency-reduced-pom.xml
+composer.lock
+composer.phar
+
+config/config.php
+
