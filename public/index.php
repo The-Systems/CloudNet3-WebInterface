@@ -35,6 +35,8 @@ if (!file_exists($path_message)) {
     die('<h1><span style="color: #FF0000">Ein Fehler ist aufgetreten.</span></h1><h3>Die Datei "/config/message.json" konnte nicht gefunden werden</h3><h3>Führe das Setup mit "wisetup" im Master erneut aus!</h3>');
 }
 
+if(!isset($_SESSION['cn3-wi-csrf'])) $_SESSION['cn3-wi-csrf'] = uniqid('', true);
+
 $main = new webinterface\main($config, $version);
 
 $app = System\App::instance();
@@ -44,6 +46,14 @@ $app->route = System\Route::instance($app->request);
 $route = $app->route;
 
 if(isset($_SESSION['cn3-wi-access_token'])){
+    $user = main::buildRequest("auth", $_SESSION['cn3-wi-access_token'], "POST");
+    if(!$user['success']){
+        unset($_SESSION['cn3-wi-access_token']);
+        header('Location: '.main::getUrl());
+        die();
+    }
+
+
     $route->any('/', function () {
         if(isset($_POST['action'])){
             if (isset($_POST['csrf'])) {
@@ -75,8 +85,8 @@ if(isset($_SESSION['cn3-wi-access_token'])){
 } else {
     $route->any('/', function () {
         if(isset($_POST['action'])){
-            if (isset($_POST['csrf'])) {
-                if ($_POST['csrf'] != $_SESSION['csrf']) {
+            if (isset($_POST['cn3-wi-csrf'])) {
+                if ($_POST['cn3-wi-csrf'] != $_SESSION['cn3-wi-csrf']) {
                     header('Location: ' . main::getUrl() . "/?action&success=false&message=csrfFailed");
                     die();
                 }

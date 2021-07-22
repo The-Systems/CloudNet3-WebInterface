@@ -1,3 +1,14 @@
+<?= $nodes = \webinterface\main::buildRequest("cluster", $_SESSION['cn3-wi-access_token'], "GET"); ?>
+<?php
+$services = 0;
+$memory_min = 0;
+$memory_max = 0;
+foreach($nodes['nodes'] as $node){
+    $services += $node['nodeInfoSnapshot']['currentServicesCount'];
+    $memory_max += $node['nodeInfoSnapshot']['maxMemory'];
+    $memory_min += $node['nodeInfoSnapshot']['usedMemory'];
+}
+?>
 <main class="w-full flex-grow p-6">
     <div class="py-1">
         <main class="h-full overflow-y-auto">
@@ -20,7 +31,7 @@
                         </div>
                         <div>
                             <p class="mb-2 text-base font-medium text-gray-400">Servers</p>
-                            <p class="text-xl font-semibold dark:text-white text-gray-900">10</p>
+                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $services; ?></p>
                         </div>
                     </div>
                     <!-- CPU -->
@@ -40,7 +51,7 @@
                         </div>
                         <div>
                             <p class="mb-2 text-base font-medium text-gray-400">Ram</p>
-                            <p class="text-xl font-semibold dark:text-white text-gray-900">100MB/500MB</p>
+                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $memory_min ?>MB/<?= $memory_max; ?>MB</p>
                         </div>
                     </div>
                 </div>
