@@ -22,8 +22,7 @@ if (file_exists($path_vendor)) {
 
 if (file_exists($path_config)) {
     require $path_config;
-} else {
-    die('<h1><span style="color: #FF0000">Ein Fehler ist aufgetreten.</span></h1><h3>Die Datei "/config/config.php" konnte nicht gefunden werden.</h3><h3>Führe das Setup mit "wisetup" im Master erneut aus!</h3>');
+} else {    die('<h1><span style="color: #FF0000">Ein Fehler ist aufgetreten.</span></h1><h3>Die Datei "/config/config.php" konnte nicht gefunden werden.</h3><h3>Führe das Setup mit "wisetup" im Master erneut aus!</h3>');
 }
 
 if (file_exists($path_version)) {
@@ -97,7 +96,7 @@ if(isset($_SESSION['cn3-wi-access_token'])){
             }
         }
 
-        include "../pages/header.php";
+        include "../pages/small-header.php";
         include "../pages/webinterface/login.php";
         include "../pages/footer.php";
 
