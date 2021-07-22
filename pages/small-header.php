@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link href="assets/styles.css" rel="stylesheet">
     <script src="./assets/js/charts-ram.js" defer></script>
     <script src="./assets/js/charts-cpu.js" defer></script>
