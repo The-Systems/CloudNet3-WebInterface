@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link href="../public/assets/styles.css" rel="stylesheet">
-    <script src="../public/assets/js/charts-ram.js" defer></script>
-    <script src="../public/assets/js/charts-cpu.js" defer></script>
+    <link href="/assets/styles.css" rel="stylesheet">
+    <script src="/assets/js/charts-ram.js" defer></script>
+    <script src="/assets/js/charts-cpu.js" defer></script>
 </head>
 <body class="dark:bg-gray-900 bg-gray-100">
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
@@ -41,21 +41,19 @@
         </div>
         <nav :class="{'block': open, 'hidden': !open}" class="flex-grow md:block px-4 pb-4 md:pb-0 md:overflow-y-auto">
             <a class="block px-4 py-2 mt-2 text-sm font-semibold dark:text-white dark:bg-gray-900 text-gray-900 bg-gray-100 rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-               href="#">Dashboard</a>
+               href="<?= \webinterface\main::getUrl(); ?>">Dashboard</a>
             <a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-400 bg-transparent rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-               href="cluster.html">Cluster</a>
+               href="<?= \webinterface\main::getUrl().'/cluster'; ?>">Cluster</a>
             <a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-400 bg-transparent rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-               href="tasks.html">Tasks</a>
+               href="<?= \webinterface\main::getUrl().'/tasks'; ?>">Tasks</a>
             <a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-400 bg-transparent rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-               href="groups.html">Groups</a>
+               href="<?= \webinterface\main::getUrl().'/groups'; ?>">Groups</a>
             <a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-400 bg-transparent rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-               href="service.html">Services</a>
+               href="<?= \webinterface\main::getUrl().'/permissions'; ?>">Permissions</a>
             <a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-400 bg-transparent rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-               href="permissions.html">Permissions</a>
+               href="<?= \webinterface\main::getUrl().'/players'; ?>">Players</a>
             <a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-400 bg-transparent rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-               href="players.html">Players</a>
-            <a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-400 bg-transparent rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-               href="modules.html">Modules</a>
+               href="<?= \webinterface\main::getUrl().'/modules'; ?>">Modules</a>
             <div :class="{'block': open, 'hidden': !open}"
                  class="flex-grow md:block px-4 pb-4 md:pb-0 md:overflow-y-auto">
                 <a class="flex items-center py-2 px-8 dark:text-gray-100 hover:dark:text-gray-200 text-gray-800 hover:text-gray-900"

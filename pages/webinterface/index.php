@@ -1,11 +1,9 @@
 <?php
 
-use webinterface\main;
 
-$nodes = main::buildDefaultRequest("cluster", "GET");
+$nodes = \webinterface\main::buildDefaultRequest("cluster", "GET");
 
 $services = 0;
-$currentVersion = "Unknown";
 
 $connectedNodeCount = 0;
 $totalNodeCount = sizeof($nodes);
@@ -23,7 +21,6 @@ foreach ($nodes['nodes'] as $node) {
 
     $connectedNodeCount++;
 
-    $currentVersion = $node['nodeInfoSnapshot']['version'];
     $services += $node['nodeInfoSnapshot']['currentServicesCount'];
 
     $memory_max += $node['nodeInfoSnapshot']['maxMemory'];
@@ -151,14 +148,21 @@ foreach ($nodes['nodes'] as $node) {
                         </div>
                     </div>
                     <!-- Status -->
+                    <?php $version = \webinterface\main::testIfLatestVersion(); ?>
+                    <?php if(!$version['success']){ ?>
                     <div class="min-w-0 p-4 text-white bg-gradient-to-br from-red-600 to-red-800 rounded-lg shadow-xs">
                         <h4 class="mb-4 font-bold">Warning!</h4>
                         <p>
-                            Currently you are using an outdated CloudNet version (<?= $currentVersion ?>), to keep the Cloud up to
+                            <?php if($version['response']['error_code'] == 202){ ?>
+                            Currently you are using an outdated Webinterface version (<?= $version['response']['error_extra']['current'] ?>), to keep the Webinterface up to
                             date and
-                            to get support, you can activate the auto updater in the launcher.cnl file.
+                            to get support, update to the latest version (<?= $version['response']['error_extra']['latest'] ?>).
+                            <?php } else if($version['response']['error_code'] == 503){ ?>
+                                The TheSystems control server is currently unavailable.
+                            <?php } ?>
                         </p>
                     </div>
+                    <?php } ?>
                 </div>
             </div>
         </main>

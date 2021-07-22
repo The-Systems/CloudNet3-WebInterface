@@ -1,6 +1,7 @@
 <div class="w-full h-screen flex items-center justify-center">
     <form class="w-full md:w-1/3 bg-white rounded-lg" method="post">
         <input name="action" value="login" type="hidden">
+        <input name="csrf" value="<?= $_SESSION['cn3-wi-csrf'] ?>" type="hidden">
         <div class="flex font-bold justify-center mt-6">
             <img class="h-20 w-20"
                  src="https://raw.githubusercontent.com/sefyudem/Responsive-Login-Form/master/img/avatar.svg">
