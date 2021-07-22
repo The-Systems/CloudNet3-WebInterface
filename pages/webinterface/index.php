@@ -1,14 +1,39 @@
-<?= $nodes = \webinterface\main::buildRequest("cluster", $_SESSION['cn3-wi-access_token'], "GET"); ?>
 <?php
+
+use webinterface\main;
+
+$nodes = main::buildDefaultRequest("cluster", "GET");
+
 $services = 0;
+$currentVersion = "Unknown";
+
+$connectedNodeCount = 0;
+$totalNodeCount = sizeof($nodes);
+
 $memory_min = 0;
 $memory_max = 0;
-foreach($nodes['nodes'] as $node){
+
+$cpu_used = 0;
+$cpu_max = 0;
+
+foreach ($nodes['nodes'] as $node) {
+    if ($node['available'] === false) {
+        continue;
+    }
+
+    $connectedNodeCount++;
+
+    $currentVersion = $node['nodeInfoSnapshot']['version'];
     $services += $node['nodeInfoSnapshot']['currentServicesCount'];
+
     $memory_max += $node['nodeInfoSnapshot']['maxMemory'];
     $memory_min += $node['nodeInfoSnapshot']['usedMemory'];
+
+    $cpu_max += 100;
+    $cpu_used += min(round($node['nodeInfoSnapshot']['processSnapshot']['cpuUsage'] * 100), 100);
 }
 ?>
+
 <main class="w-full flex-grow p-6">
     <div class="py-1">
         <main class="h-full overflow-y-auto">
@@ -17,11 +42,11 @@ foreach($nodes['nodes'] as $node){
                     <!--Users-->
                     <div class="flex items-center p-4 dark:bg-gray-800 bg-white rounded-lg shadow-lg">
                         <div class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full">
-                            <img src="assets/icons/user.svg"/>
+                            <img src="assets/icons/cluster.png"/>
                         </div>
                         <div>
-                            <p class="mb-2 text-base font-medium text-gray-400">Users</p>
-                            <p class="text-xl font-semibold dark:text-white text-gray-900">35/100</p>
+                            <p class="mb-2 text-base font-medium text-gray-400">Connected nodes</p>
+                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $connectedNodeCount ?>/<?= $totalNodeCount ?></p>
                         </div>
                     </div>
                     <!-- Servers -->
@@ -30,8 +55,8 @@ foreach($nodes['nodes'] as $node){
                             <img src="assets/icons/server.svg"/>
                         </div>
                         <div>
-                            <p class="mb-2 text-base font-medium text-gray-400">Servers</p>
-                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $services; ?></p>
+                            <p class="mb-2 text-base font-medium text-gray-400">Service count</p>
+                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $services ?></p>
                         </div>
                     </div>
                     <!-- CPU -->
@@ -41,7 +66,7 @@ foreach($nodes['nodes'] as $node){
                         </div>
                         <div>
                             <p class="mb-2 text-base font-medium text-gray-400">CPU</p>
-                            <p class="text-xl font-semibold dark:text-white text-gray-900">55%/100%</p>
+                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $cpu_used ?>%/<?= $cpu_max; ?>%</p>
                         </div>
                     </div>
                     <!-- Ram -->
@@ -51,7 +76,8 @@ foreach($nodes['nodes'] as $node){
                         </div>
                         <div>
                             <p class="mb-2 text-base font-medium text-gray-400">Ram</p>
-                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $memory_min ?>MB/<?= $memory_max; ?>MB</p>
+                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $memory_min ?>
+                                MB/<?= $memory_max; ?>MB</p>
                         </div>
                     </div>
                 </div>
@@ -128,7 +154,8 @@ foreach($nodes['nodes'] as $node){
                     <div class="min-w-0 p-4 text-white bg-gradient-to-br from-red-600 to-red-800 rounded-lg shadow-xs">
                         <h4 class="mb-4 font-bold">Warning!</h4>
                         <p>
-                            Currently you are using an outdated CloudNet version (${version}), to keep the Cloud up to date and
+                            Currently you are using an outdated CloudNet version (<?= $currentVersion ?>), to keep the Cloud up to
+                            date and
                             to get support, you can activate the auto updater in the launcher.cnl file.
                         </p>
                     </div>

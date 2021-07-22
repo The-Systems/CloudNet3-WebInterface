@@ -1,4 +1,5 @@
 <?php
+
 namespace webinterface;
 
 use JetBrains\PhpStorm\Pure;
@@ -18,64 +19,54 @@ class main
     {
         return self::$configObj;
     }
+
     public static function getVersionObj(): array
     {
         return self::$versionObj;
     }
 
+    #[Pure] public static function provideUrl($subPath): string
+    {
+        return self::getconfig()['cloudnet']['protocol'] . self::getconfig()['cloudnet']['ip'] . ":" . self::getconfig()['cloudnet']['port'] . self::getconfig()['cloudnet']['path'] . "/$subPath";
+    }
 
-    public static function buildRequest($url, $token, $method = "POST", $params = array()){
-        $url = self::getconfig()['cloudnet']['protocol'] . self::getconfig()['cloudnet']['ip'] . ":" . self::getconfig()['cloudnet']['port'] . self::getconfig()['cloudnet']['path'] . "/".$url;
+    public static function buildDefaultRequest($url, $method = "POST", $headers = array(), $params = array()): mixed
+    {
+        return self::buildRequest($url, $_SESSION['cn3-wi-access_token'], $method, $headers, $params);
+    }
+
+    public static function buildRequest($url, $token, $method = "POST", $headers = array(), $params = array()): mixed
+    {
+        array_push($headers, 'Authorization: Bearer ' . $token);
 
         $curl = curl_init();
-
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
+            CURLOPT_URL => self::provideUrl($url),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_MAXREDIRS => 1,
             CURLOPT_TIMEOUT => 5,
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_POSTFIELDS => $params,
-            CURLOPT_HTTPHEADER => array(
-                'Authorization: Bearer '.$token
-            ),
+            CURLOPT_HTTPHEADER => $headers,
         ));
 
         $response = curl_exec($curl);
+        $responseHttpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         curl_close($curl);
+        if ($response === FALSE || $responseHttpCode !== 200) {
+            return array("success" => "false");
+        }
 
         return json_decode($response, true);
     }
 
-    public static function getUrl($only = "all"): string
+    public static function getMessage($key)
     {
-        $config = self::$configObj;
-
-        $main = $config['url']['main'];
-        $ssl = $config['url']['ssl'];
-        $pfad = $config['url']['pfad'];
-        $without_sub = $config['url']['without_sub'];
-
-        if ($only == "all") {
-            return $ssl . "" . $main . "" . $pfad;
-        } elseif ($only == "pfad") {
-            return $pfad;
-        } elseif ($only == "main") {
-            return $main;
-        } elseif ($only == "ssl") {
-            return $ssl;
-        } elseif ($only == "without_sub") {
-            return $without_sub;
-        } else {
-            return $ssl . "" . $main . "" . $pfad;
-        }
-    }
-    public static function getMessage($key){
         $file = dirname(__FILE__) . "/../../config/message.json";
         $json = file_get_contents($file);
         $message = json_decode($json, true);
-        if(isset($message[$key])) {
+        if (isset($message[$key])) {
             return $message[$key];
         } else {
             return $key;
@@ -86,6 +77,7 @@ class main
     {
         return main::getVersionObj()['version'];
     }
+
     public static function getVersion(): array
     {
         $url = main::getVersionObj()['version_url'];
@@ -97,7 +89,7 @@ class main
         curl_close($ch);
 
         $response = curl_exec($ch);
-        if($response === FALSE){
+        if ($response === FALSE) {
             return array("success" => false, "response" => "server down");
         }
         return json_decode($json, true);
