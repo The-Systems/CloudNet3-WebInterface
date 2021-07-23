@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link href="/assets/styles.css" rel="stylesheet">
-    <script src="/assets/js/charts-ram.js" defer></script>
-    <script src="/assets/js/charts-cpu.js" defer></script>
+    <link href="<?= \webinterface\main::getUrl(); ?>/assets/styles.css" rel="stylesheet">
+    <script src="<?= \webinterface\main::getUrl(); ?>/assets/js/charts-ram.js" defer></script>
+    <script src="<?= \webinterface\main::getUrl(); ?>/assets/js/charts-cpu.js" defer></script>
 </head>
 <body class="dark:bg-gray-900 bg-gray-100">
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
@@ -57,7 +57,7 @@
             <div :class="{'block': open, 'hidden': !open}"
                  class="flex-grow md:block px-4 pb-4 md:pb-0 md:overflow-y-auto">
                 <a class="flex items-center py-2 px-8 dark:text-gray-100 hover:dark:text-gray-200 text-gray-800 hover:text-gray-900"
-                   href="../public/index.php?action=logout">
+                   href="<?= \webinterface\main::getUrl().'/logout'; ?>">
                     <svg class="text-gray-900 dark:text-white" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
                          xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
                          width="16" height="16" x="0" y="0" viewBox="0 0 512.00533 512"

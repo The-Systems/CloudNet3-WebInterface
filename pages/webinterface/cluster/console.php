@@ -1,7 +1,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(() => {
-        let socketUrl = "<?= webinterface\main::provideSocketUrl() . "/service/" . $service_name . "/liveLog?ticket=" . $ticket; ?>";
+        let socketUrl = "<?= webinterface\main::provideSocketUrl() . "/node/" . $node_id . "/liveConsole?ticket=" . $ticket; ?>";
         let websocket = new WebSocket(socketUrl);
 
         websocket.onerror = () => websocket.close()
@@ -40,7 +40,6 @@
     <div class="py-3">
         <main class="h-full overflow-y-auto">
             <div class="container mx-auto grid">
-                <h6 class="mb-4 font-semibold dark:text-white text-gray-900">Console for <?= $service['snapshot']['configuration']['serviceId']['taskName'] . "-" . $service['snapshot']['configuration']['serviceId']['taskServiceId'] ?></h6>
                 <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-1">
                     <!-- Command input -->
                     <div class="w-full">
@@ -68,10 +67,11 @@
                             <div id="socket_event"></div>
 
                             <?php
-                            $console = \webinterface\main::buildDefaultRequest("service/" . $service_name."/logLines", "GET");
-                            foreach(array_reverse($console['lines']) as $log){
-                                echo '<div class="dark:text-gray-200 text-gray-800 text-sm">'.$log.'</div>';
-                            }
+                            #$console = \webinterface\main::buildDefaultRequest("node/" . $node_id."/logLines", "GET");
+                            #print_r($console);
+                            #foreach(array_reverse($console['lines']) as $log){
+                            #    echo '<div class="dark:text-gray-200 text-gray-800 text-sm">'.$log.'</div>';
+                            #}
                             ?>
 
                         </div>

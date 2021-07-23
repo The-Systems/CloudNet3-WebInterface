@@ -48,31 +48,37 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
     $app->route->group('/tasks', function () use ($main) {
         $this->any('/', function () use ($main) {
-            if (isset($_POST['name'])) {
-                // validate that all required values are there
-                $name = $_POST['name'];
-                $ram = $_POST['ram'];
-                $env = $_POST['environment'];
-                $node = $_POST['node'];
-                $startPort = $_POST['port'];
-                $static = $_POST['static'];
-                $autoDeleteOnStop = $_POST['auto_delete_on_stop'];
-                $maintenance = $_POST['maintenance'];
+            if (isset($_POST['action'])) {
+                if (!main::validCSRF()) {
+                    header('Location: ' . main::getUrl() . "/cluster?action&success=false&message=csrfFailed");
+                    die();
+                }
 
-                if (isset($name, $ram, $env, $node, $startPort)) {
-                    $taskData = webinterface\jsonObjectCreator::createServiceTaskObject(
-                        $name, $ram, $env,
-                        $node === "all" ? null : $node,
-                        $startPort, isset($static), isset($autoDeleteOnStop), isset($maintenance)
-                    );
-                    $response = $main::buildDefaultRequest("task", params: $taskData);
-                    if (!$response['success']) {
-                        header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=duplicateTask");
+                if ($_POST['action'] == "createTask" and isset($_POST['name'])) {
+                    // validate that all required values are there
+                    $name = $_POST['name'];
+                    $ram = $_POST['ram'];
+                    $env = $_POST['environment'];
+                    $node = $_POST['node'];
+                    $startPort = $_POST['port'];
+                    $static = $_POST['static'];
+                    $autoDeleteOnStop = $_POST['auto_delete_on_stop'];
+                    $maintenance = $_POST['maintenance'];
+
+                    if (isset($name, $ram, $env, $node, $startPort)) {
+                        $taskData = webinterface\jsonObjectCreator::createServiceTaskObject(
+                            $name, $ram, $env,
+                            $node === "all" ? null : $node,
+                            $startPort, isset($static), isset($autoDeleteOnStop), isset($maintenance)
+                        );
+                        $response = $main::buildDefaultRequest("task", params: $taskData);
+                        if (!$response['success']) {
+                            header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=duplicateTask");
+                            die();
+                        }
+                        header('Location: ' . main::getUrl() . "/tasks?action&success=true");
                         die();
                     }
-
-                    header('Location: ' . main::getUrl() . "/tasks?action&success=true");
-                    die();
                 }
             }
 
@@ -101,8 +107,20 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
                     header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=csrfFailed");
                     die();
                 }
-
                 // FUNCTIONS
+
+                if($_POST['action'] == "stopService" AND isset($_POST['service_id'])){
+                    $response = $main::buildDefaultRequest("service/".$_POST['service_id'], "DELETE");
+                    header('Location: ' . main::getUrl() . "/tasks?action&success=true&message=stopService");
+                }
+                if($_POST['action'] == "startService" AND isset($_POST['count'])){
+                    $i = $_POST['count'];
+                    while ($i != 0) {
+                        $i -= 1;
+                        $response = $main::buildDefaultRequest("service/create", params: $task_name);
+                        print_r($response);
+                    }
+                }
             }
 
             include "../pages/header.php";
@@ -111,8 +129,8 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
         });
 
         $this->any('/?/?/console', function ($task_name, $service_name) use ($main) {
-            $task = main::buildDefaultRequest("service/" . $service_name, "GET");
-            if (!$task['success']) {
+            $service = main::buildDefaultRequest("service/" . $service_name, "GET");
+            if (!$service['success']) {
                 header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=notFound");
                 die();
             }
@@ -131,24 +149,57 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
         });
     });
 
-    $route->any('/cluster', function () use ($main) {
-        if (isset($_POST['action'])) {
-            if (!main::validCSRF()) {
-                header('Location: ' . main::getUrl() . "/cluster?action&success=false&message=csrfFailed");
+    $route->group('/cluster', function () use ($main) {
+        $this->any('/', function () use ($main) {
+            if (isset($_POST['action'])) {
+                if (!main::validCSRF()) {
+                    header('Location: ' . main::getUrl() . "/cluster?action&success=false&message=csrfFailed");
+                    die();
+                }
+
+                if ($_POST['action'] == "stopNode" and isset($_POST['node_id'])) {
+                    main::buildDefaultRequest("cluster/" . $_POST['node_id'] . "/command", "POST", array(), json_encode(array("command" => "stop")));
+                    $action = main::buildDefaultRequest("cluster/" . $_POST['node_id'] . "/command", "POST", array(), json_encode(array("command" => "stop")));
+                    // two times, because cloudnet require two stop commands
+
+                    header('Location: ' . main::getUrl() . "/cluster?action&success=true&message=nodeStop");
+                    die();
+                }
+                if ($_POST['action'] == "deleteNode" and isset($_POST['node_id'])) {
+                    main::buildDefaultRequest("cluster/" . $_POST['node_id'], "DELETE", array(), array());
+                    header('Location: ' . main::getUrl() . "/cluster?action&success=true&message=nodeDelete");
+                    die();
+                }
+                if ($_POST['action'] == "createNode" and isset($_POST['name'])) {
+                    $action = main::buildDefaultRequest("cluster", "POST", array(), json_encode(array("properties" => array(), "uniqueId" => $_POST['name'], "listeners" => array((array("host" => $_POST['host'], "port" => $_POST['port']))))));
+                    header('Location: ' . main::getUrl() . "/cluster?action&success=true&message=nodeCreate");
+                    die();
+                }
+
+            }
+
+            include "../pages/header.php";
+            include "../pages/webinterface/cluster/index.php";
+            include "../pages/footer.php";
+        });
+        $this->any('/?/console', function ($node_id) use ($main) {
+            $cluster = main::buildDefaultRequest("node/" . $node_id, "GET");
+            if (!$cluster['success']) {
+                header('Location: ' . main::getUrl() . "/cluster?action&success=false&message=notFound");
+                die();
+            }
+            $ticket = main::buildDefaultRequest("wsTicket");
+            if (!$ticket['success']) {
+                header('Location: ' . main::getUrl() . "/cluster?action&success=false&message=notFound");
                 die();
             }
 
-            if ($_POST['action'] == "stopNode" and isset($_POST['node_id'])) {
-                main::buildDefaultRequest("cluster/" . $_POST['node_id'] . "/command", "POST", array(), json_encode(array("command" => "stop")));
-                // $action = \webinterface\main::buildDefaultRequest("cluster/" . $_POST['node_id'] . "/command", "POST", array(), json_encode(array("command" => "stop")));
-                header('Location: ' . main::getUrl() . "/cluster?action&success=true&message=nodeStop");
-                die();
-            }
-        }
+            $ticket = $ticket['id'];
 
-        include "../pages/header.php";
-        include "../pages/webinterface/cluster.php";
-        include "../pages/footer.php";
+            include "../pages/header.php";
+            include "../pages/webinterface/cluster/console.php";
+            include "../pages/footer.php";
+        });
     });
 
     // logout page
@@ -182,4 +233,10 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
         include "../pages/footer.php";
     });
 }
+
+$route->any('/*', function () use ($main) {
+    header('Location: ' . main::getUrl());
+    die();
+});
+
 $app->route->end();

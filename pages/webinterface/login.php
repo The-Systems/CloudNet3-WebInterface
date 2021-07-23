@@ -4,9 +4,9 @@
         <input name="csrf" value="<?= $_SESSION['cn3-wi-csrf'] ?>" type="hidden">
         <div class="flex font-bold justify-center mt-6">
             <img class="h-20 w-20"
-                 src="https://raw.githubusercontent.com/sefyudem/Responsive-Login-Form/master/img/avatar.svg">
+                 src="<?= \webinterface\main::getUrl(); ?>/assets/logo.svg">
         </div>
-        <h2 class="text-3xl text-center text-gray-700 mb-4">Interface login</h2>
+        <h2 class="text-3xl text-center text-gray-700 mb-4">CloudNet Webinterface</h2>
         <div class="px-12 pb-10">
             <div class="w-full mb-2">
                 <div class="flex items-center">

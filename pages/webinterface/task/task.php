@@ -98,23 +98,45 @@
                                         </div>
                                     </li>
                                     <div class="flex items-center p-4">
-                                        <a href="<?= \webinterface\main::getUrl() . '/tasks/' . $task_name . '/' . $service['configuration']['serviceId']['taskName'] . "-" . $service['configuration']['serviceId']['taskServiceId'] . '/console'; ?>"
+                                        <a href="<?= \webinterface\main::getUrl() . '/tasks/' . $task_name . '/' . $service['configuration']['serviceId']['uniqueId'] . '/console'; ?>"
                                            class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">Console</a>
-                                        <button type="button"
-                                                class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">
-                                            Edit
-                                        </button>
-                                        <button type="button"
-                                                class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">
-                                            Restart
-                                        </button>
-                                        <button type="button"
-                                                class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">
-                                            Delete
-                                        </button>
+
+                                        <form method="post">
+                                            <input name="action" value="stopService" type="hidden">
+                                            <input name="service_id" value="<?= $service['configuration']['serviceId']['uniqueId']; ?>" type="hidden">
+                                            <input name="csrf" value="<?= $_SESSION['cn3-wi-csrf'] ?>" type="hidden">
+                                            <button type="submit"
+                                                    class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">
+                                                Stop
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             <?php } ?>
+                        </div>
+                    </div>
+                    <div class="w-full">
+                        <div class="coding inverse-toggle px-5 pt-4 shadow-lg text-gray-100 dark:bg-gray-800 bg-white pb-6 pt-4 rounded-lg leading-normal overflow-hidden">
+                            <div class="top mb-2 flex">
+                                <h4 class="mb-2 font-semibold dark:text-white text-gray-900">Start</h4>
+                            </div>
+
+                            <form method="post">
+                                <input name="action" value="startService" type="hidden">
+                                <input name="csrf" value="<?= $_SESSION['cn3-wi-csrf'] ?>" type="hidden">
+                                <div class="flex-1 flex flex-col md:flex-row text-sm font-mono subpixel-antialiased">
+                                    <div class="w-full flex-1 mx-2">
+                                        <input placeholder="Count" type="number" name="count"
+                                               id="Count-input"
+                                               class="my-2 p-2 dark:bg-gray-900 bg-gray-100 flex border dark:border-gray-900 border-gray-100 rounded px-2 appearance-none outline-none w-full dark:text-white text-gray-900 focus:ring-2 focus:ring-blue-600">
+                                    </div>
+                                </div>
+                                <button type="submit"
+                                        id="execute-command"
+                                        class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">
+                                    Execute
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
