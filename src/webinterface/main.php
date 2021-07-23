@@ -49,10 +49,12 @@ class main
             return $ssl . "" . $main . "" . $pfad;
         }
     }
+
     #[Pure] public static function provideUrl($subPath): string
     {
         return self::getconfig()['cloudnet']['protocol'] . self::getconfig()['cloudnet']['ip'] . ":" . self::getconfig()['cloudnet']['port'] . self::getconfig()['cloudnet']['path'] . "/$subPath";
     }
+
     #[Pure] public static function provideSocketUrl(): string
     {
         return self::getconfig()['cloudnet']['socket']['protocol'] . self::getconfig()['cloudnet']['socket']['ip'] . ":" . self::getconfig()['cloudnet']['socket']['port'] . self::getconfig()['cloudnet']['socket']['path'];

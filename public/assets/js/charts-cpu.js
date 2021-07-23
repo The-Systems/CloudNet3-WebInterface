@@ -15,50 +15,52 @@
  */
 
 const linecpuConfig = {
-  type: 'line',
-  data: {
-    labels: ['14:00', '14:10', '14:20', '14:30', '14:40', '14:50', '15:00'],
-    datasets: [
-      {
-        label: 'Usage in %',
-        backgroundColor: '#5b96f7',
-        borderColor: '#5b96f7',
-        data: [0, 12, 32, 90, 50, 43, 70],
-        fill: false,
-      }
-    ],
-  },
-  options: {
-    responsive: true,
-    legend: {
-      display: false,
+    type: 'line',
+    data: {
+        labels: ['14:00', '14:10', '14:20', '14:30', '14:40', '14:50', '15:00'],
+        datasets: [
+            {
+                label: 'Usage in %',
+                backgroundColor: '#5b96f7',
+                borderColor: '#5b96f7',
+                data: [0, 12, 32, 90, 50, 43, 70],
+                fill: false,
+            }
+        ],
     },
-    tooltips: {
-      mode: 'index',
-      intersect: false,
-    },
-    hover: {
-      mode: 'nearest',
-      intersect: true,
-    },
-    scales: {
-      x: {
-        display: true,
-        scaleLabel: {
-          display: true,
-          labelString: 'Value',
+    options: {
+        responsive: true,
+        legend: {
+            display: false,
         },
-      },
-      y: {
-        display: true,
-        scaleLabel: {
-          display: true,
-          labelString: 'Value',
+        tooltips: {
+            mode: 'index',
+            intersect: false,
         },
-      },
+        hover: {
+            mode: 'nearest',
+            intersect: true,
+        },
+        scales: {
+            x: {
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Value',
+                },
+            },
+            y: {
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Value',
+                },
+            },
+        },
     },
-  },
 }
 
 const lineId = document.getElementById('cpu')
-window.myLine = new Chart(lineId, linecpuConfig)
+if (lineId !== null) {
+    window.myLine = new Chart(lineId, linecpuConfig)
+}

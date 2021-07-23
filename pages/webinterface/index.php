@@ -1,12 +1,12 @@
 <?php
+use webinterface\main;
 
-
-$nodes = \webinterface\main::buildDefaultRequest("cluster", "GET");
+$nodes = main::buildDefaultRequest("cluster", "GET");
 
 $services = 0;
 
 $connectedNodeCount = 0;
-$totalNodeCount = sizeof($nodes);
+$totalNodeCount = sizeof($nodes['nodes']);
 
 $memory_min = 0;
 $memory_max = 0;
@@ -148,7 +148,7 @@ foreach ($nodes['nodes'] as $node) {
                         </div>
                     </div>
                     <!-- Status -->
-                    <?php $version = \webinterface\main::testIfLatestVersion(); ?>
+                    <?php $version = main::testIfLatestVersion(); ?>
                     <?php if(!$version['success']){ ?>
                     <div class="min-w-0 p-4 text-white bg-gradient-to-br from-red-600 to-red-800 rounded-lg shadow-xs">
                         <h4 class="mb-4 font-bold">Warning!</h4>

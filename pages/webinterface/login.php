@@ -22,7 +22,7 @@
                            class="-mx-6 px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none"/>
                 </div>
             </div>
-            <br />
+            <br/>
             <button type="submit"
                     class="w-full py-2 rounded-full bg-green-600 text-gray-100  focus:outline-none">Login
             </button>
