@@ -81,9 +81,8 @@ class main
         ));
 
         $response = curl_exec($curl);
-        $responseHttpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
         curl_close($curl);
+
         if ($response === FALSE) {
             return array("success" => "false");
         }

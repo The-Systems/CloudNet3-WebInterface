@@ -48,6 +48,34 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
     $app->route->group('/tasks', function () use ($main) {
         $this->any('/', function () use ($main) {
+            if (isset($_POST['name'])) {
+                // validate that all required values are there
+                $name = $_POST['name'];
+                $ram = $_POST['ram'];
+                $env = $_POST['environment'];
+                $node = $_POST['node'];
+                $startPort = $_POST['port'];
+                $static = $_POST['static'];
+                $autoDeleteOnStop = $_POST['auto_delete_on_stop'];
+                $maintenance = $_POST['maintenance'];
+
+                if (isset($name, $ram, $env, $node, $startPort)) {
+                    $taskData = webinterface\jsonObjectCreator::createServiceTaskObject(
+                        $name, $ram, $env,
+                        $node === "all" ? null : $node,
+                        $startPort, isset($static), isset($autoDeleteOnStop), isset($maintenance)
+                    );
+                    $response = $main::buildDefaultRequest("task", params: $taskData);
+                    if (!$response['success']) {
+                        header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=duplicateTask");
+                        die();
+                    }
+
+                    header('Location: ' . main::getUrl() . "/tasks?action&success=true");
+                    die();
+                }
+            }
+
             include "../pages/header.php";
             include "../pages/webinterface/task/index.php";
             include "../pages/footer.php";
