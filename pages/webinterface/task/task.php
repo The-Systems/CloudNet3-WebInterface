@@ -129,6 +129,13 @@
                                         <input placeholder="Count" type="number" name="count"
                                                id="Count-input"
                                                class="my-2 p-2 dark:bg-gray-900 bg-gray-100 flex border dark:border-gray-900 border-gray-100 rounded px-2 appearance-none outline-none w-full dark:text-white text-gray-900 focus:ring-2 focus:ring-blue-600">
+
+                                        <label class="inline-flex items-center mt-3">
+                                            <input type="checkbox" name="start" class="form-checkbox h-5 w-5"
+                                                   checked><span
+                                                    class="ml-2 dark:text-white text-gray-900">Start on create</span>
+                                        </label>
+
                                     </div>
                                 </div>
                                 <button type="submit"

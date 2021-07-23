@@ -104,22 +104,22 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
             if (isset($_POST['action'])) {
                 if (!main::validCSRF()) {
-                    header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=csrfFailed");
+                    header('Location: ' . main::getUrl() . "/tasks/".$task_name."?action&success=false&message=csrfFailed");
                     die();
                 }
                 // FUNCTIONS
 
                 if($_POST['action'] == "stopService" AND isset($_POST['service_id'])){
                     $response = $main::buildDefaultRequest("service/".$_POST['service_id'], "DELETE");
-                    header('Location: ' . main::getUrl() . "/tasks?action&success=true&message=stopService");
+                    header('Location: ' . main::getUrl() . "/tasks/".$task_name."?action&success=true&message=stopService");
                 }
                 if($_POST['action'] == "startService" AND isset($_POST['count'])){
                     $i = $_POST['count'];
                     while ($i != 0) {
                         $i -= 1;
-                        $response = $main::buildDefaultRequest("service/create", params: $task_name);
-                        print_r($response);
+                        $response = $main::buildDefaultRequest("service/create", params: json_encode(array("start" => isset($_POST['start']), "serviceTaskName" => $task_name)));
                     }
+                    header('Location: ' . main::getUrl() . "/tasks/".$task_name."?action&success=true&message=startService");
                 }
             }
 
@@ -137,7 +137,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
             $ticket = main::buildDefaultRequest("wsTicket");
             if (!$ticket['success']) {
-                header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=notFound");
+                header('Location: ' . main::getUrl() . "/tasks/".$task_name."?action&success=false&message=notFound");
                 die();
             }
 
