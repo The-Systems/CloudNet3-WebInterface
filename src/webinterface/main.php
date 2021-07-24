@@ -2,7 +2,6 @@
 
 namespace webinterface;
 
-use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 
 class main
@@ -35,9 +34,7 @@ class main
         $pfad = $config['url']['pfad'];
         $without_sub = $config['url']['without_sub'];
 
-        if ($only == "all") {
-            return $ssl . "" . $main . "" . $pfad;
-        } elseif ($only == "pfad") {
+        if ($only == "pfad") {
             return $pfad;
         } elseif ($only == "main") {
             return $main;
@@ -58,6 +55,17 @@ class main
     #[Pure] public static function provideSocketUrl(): string
     {
         return self::getconfig()['cloudnet']['socket']['protocol'] . self::getconfig()['cloudnet']['socket']['ip'] . ":" . self::getconfig()['cloudnet']['socket']['port'] . self::getconfig()['cloudnet']['socket']['path'];
+    }
+
+    public static function requestWsTicket(string $errorPathRedirect): string
+    {
+        $ticket = self::buildDefaultRequest("wsTicket");
+        if (!$ticket['success']) {
+            header('Location: ' . main::getUrl() . "/$errorPathRedirect");
+            die();
+        }
+
+        return $ticket['id'];
     }
 
     public static function buildDefaultRequest($url, $method = "POST", $headers = array(), $params = array()): mixed
@@ -121,30 +129,37 @@ class main
         if ($response === FALSE) {
             return array("success" => false, "response" => "server down");
         }
+
         return json_decode($json, true);
     }
 
     public static function testIfLatestVersion(): array
     {
         $version = self::getCurrentVersion();
-        $version_e = self::getVersion();
-        if(!$version_e['success']) return array("success" => false, "response" => array("error_code" => 503, "error_message" => "version-server down"));
+        $version_latest = self::getVersion();
 
-        if($version != $version_e['response']['version']){
-            return array("success" => false, "response" => array("error_code" => 202, "error_message" => "not latest version", "error_extra" => array("current" => $version, "latest" => $version_e['response']['version'])));
+        if (!$version_latest['success']) {
+            return array("success" => false, "response" => array(
+                "error_code" => 503,
+                "error_message" => "version-server down"
+            ));
+        }
+
+        if ($version != $version_latest['response']['version']) {
+            return array("success" => false, "response" => array(
+                "error_code" => 202,
+                "error_message" => "not latest version",
+                "error_extra" => array(
+                    "current" => $version,
+                    "latest" => $version_latest['response']['version'])
+            ));
         } else {
             return array("success" => true);
         }
     }
+
     public static function validCSRF(): bool
     {
-        if (isset($_POST['csrf'])) {
-            if ($_POST['csrf'] != $_SESSION['cn3-wi-csrf']) {
-                return false;
-            }
-        } else {
-            return false;
-        }
-        return true;
+        return isset($_POST['csrf']) ?? false and $_POST['csrf'] == $_SESSION['cn3-wi-csrf'];
     }
 }
