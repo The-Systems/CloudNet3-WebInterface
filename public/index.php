@@ -42,7 +42,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
     $route->any('/', function () use ($main) {
         include "../pages/header.php";
-        include "../pages/webinterface/index.php";
+        include "../pages/webinterface/dashboard.php";
         include "../pages/footer.php";
     });
 
