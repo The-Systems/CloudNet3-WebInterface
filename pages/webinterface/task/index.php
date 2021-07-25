@@ -70,6 +70,8 @@
                                 <div class="flex items-center">
                                     <a href="/tasks/<?= $task['name']; ?>"
                                        class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">Show</a>
+                                    <a href="/tasks/<?= $task['name']; ?>/edit"
+                                       class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">Edit</a>
                                 </div>
                             </div>
                         </div>

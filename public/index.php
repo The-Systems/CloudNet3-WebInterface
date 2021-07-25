@@ -68,10 +68,11 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
                     if (isset($name, $ram, $env, $node, $startPort)) {
                         $taskData = webinterface\jsonObjectCreator::createServiceTaskObject(
                             $name, $ram, $env,
-                            $node === "all" ? null : $node,
+                            $node === "all" ? array() : array($node),
                             $startPort, isset($static), isset($autoDeleteOnStop), isset($maintenance)
                         );
                         $response = $main::buildDefaultRequest("task", params: $taskData);
+
                         if (!$response['success']) {
                             header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=duplicateTask");
                             die();
@@ -128,6 +129,54 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
             include "../pages/header.php";
             include "../pages/webinterface/task/task.php";
+            include "../pages/footer.php";
+        });
+
+        $this->any('/?/edit', function ($task_name) use ($main) {
+            $task = main::buildDefaultRequest("task/" . $task_name, "GET", array(), array());
+            if (!$task['success']) {
+                header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=notFound");
+                die();
+            }
+
+            if (isset($_POST['action'])) {
+                if (!main::validCSRF()) {
+                    header('Location: ' . main::getUrl() . "/tasks/".$task_name."?action&success=false&message=csrfFailed");
+                    die();
+                }
+                // FUNCTIONS
+                if($_POST['action'] == "editTask"){
+                    $name = $_POST['name'];
+                    $ram = $_POST['memory'];
+                    $env = $_POST['environment'];
+                    if(isset($_POST['node'])){ $node = $_POST['node']; } else { $node =  array(); }
+                    if(isset($_POST['group'])){ $group = $_POST['group']; } else { $group =  array(); }
+
+                    $startPort = $_POST['port'];
+                    $static = $_POST['static'];
+                    $autoDeleteOnStop = $_POST['auto_delete_on_stop'];
+                    $maintenance = $_POST['maintenance'];
+
+                    if (isset($name, $ram, $env, $node, $startPort)) {
+                        $taskData = webinterface\jsonObjectCreator::createServiceTaskObject(
+                            $name, $ram, $env, $node,
+                            $startPort, isset($static), isset($autoDeleteOnStop), isset($maintenance), $group
+                        );
+                        $response = $main::buildDefaultRequest("task", params: $taskData);
+                        if (!$response['success']) {
+                            header('Location: ' . main::getUrl() . "/tasks/".$task_name."/edit?action&success=false&message=duplicateTask");
+                            die();
+                        }
+                        header('Location: ' . main::getUrl() . "/tasks/".$task_name."/edit?action&success=true");
+                        die();
+                    } else {
+                        header('Location: ' . main::getUrl() . "/tasks/".$task_name."/edit?action&success=false&message=errorTask");
+                    }
+                }
+            }
+
+            include "../pages/header.php";
+            include "../pages/webinterface/task/edit.php";
             include "../pages/footer.php";
         });
 

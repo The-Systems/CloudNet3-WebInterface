@@ -97,20 +97,34 @@
                                             </div>
                                         </div>
                                     </li>
-                                    <div class="flex items-center p-4">
-                                        <a href="<?= \webinterface\main::getUrl() . '/tasks/' . $task_name . '/' . $service['configuration']['serviceId']['uniqueId'] . '/console'; ?>"
-                                           class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">Console</a>
+                                    <?php if ($service['lifeCycle'] == "RUNNING") { ?>
+                                        <div class="flex items-center p-4">
+                                            <a href="<?= \webinterface\main::getUrl() . '/tasks/' . $task_name . '/' . $service['configuration']['serviceId']['uniqueId'] . '/console'; ?>"
+                                               class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">Console</a>
 
-                                        <form method="post">
-                                            <input name="action" value="stopService" type="hidden">
-                                            <input name="service_id" value="<?= $service['configuration']['serviceId']['uniqueId']; ?>" type="hidden">
-                                            <input name="csrf" value="<?= $_SESSION['cn3-wi-csrf'] ?>" type="hidden">
-                                            <button type="submit"
-                                                    class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">
-                                                Stop
-                                            </button>
-                                        </form>
-                                    </div>
+                                            <form method="post">
+                                                <input name="action" value="stopService" type="hidden">
+                                                <input name="service_id" value="<?= $service['configuration']['serviceId']['uniqueId']; ?>" type="hidden">
+                                                <input name="csrf" value="<?= $_SESSION['cn3-wi-csrf'] ?>" type="hidden">
+                                                <button type="submit"
+                                                        class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">
+                                                    Stop
+                                                </button>
+                                            </form>
+                                        </div>
+                                    <?php } else { ?>
+                                        <div class="flex items-center p-4">
+                                            <form method="post">
+                                                <input name="action" value="startService" type="hidden">
+                                                <input name="service_id" value="<?= $service['configuration']['serviceId']['uniqueId']; ?>" type="hidden">
+                                                <input name="csrf" value="<?= $_SESSION['cn3-wi-csrf'] ?>" type="hidden">
+                                                <button type="submit"
+                                                        class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">
+                                                    Start
+                                                </button>
+                                            </form>
+                                        </div>
+                                    <?php } ?>
                                 </div>
                             <?php } ?>
                         </div>
@@ -122,7 +136,7 @@
                             </div>
 
                             <form method="post">
-                                <input name="action" value="startService" type="hidden">
+                                <input name="action" value="createService" type="hidden">
                                 <input name="csrf" value="<?= $_SESSION['cn3-wi-csrf'] ?>" type="hidden">
                                 <div class="flex-1 flex flex-col md:flex-row text-sm font-mono subpixel-antialiased">
                                     <div class="w-full flex-1 mx-2">

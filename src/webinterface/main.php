@@ -68,12 +68,12 @@ class main
         return $ticket['id'];
     }
 
-    public static function buildDefaultRequest($url, $method = "POST", $headers = array(), $params = array()): mixed
+    public static function buildDefaultRequest($url, $method = "POST", $headers = array(), $params = array(), $debug = false): mixed
     {
-        return self::buildRequest($url, $_SESSION['cn3-wi-access_token'], $method, $headers, $params);
+        return self::buildRequest($url, $_SESSION['cn3-wi-access_token'], $method, $headers, $params, $debug);
     }
 
-    public static function buildRequest($url, $token, $method = "POST", $headers = array(), $params = array()): mixed
+    public static function buildRequest($url, $token, $method = "POST", $headers = array(), $params = array(), $debug = false): mixed
     {
         array_push($headers, 'Authorization: Bearer ' . $token);
 
@@ -95,7 +95,11 @@ class main
             return array("success" => "false");
         }
 
-        return json_decode($response, true);
+        if($debug == true){
+            return $response;
+        } else {
+            return json_decode($response, true);
+        }
     }
 
     public static function getMessage($key)
