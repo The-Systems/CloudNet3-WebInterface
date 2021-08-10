@@ -6,17 +6,15 @@
 
 # <b>CloudNet3-Webinterface</b>
 
-### A Webinterface for CloudNet 3.4+
+### A Webinterface for CloudNet 3.5+
+
+## IMPORTANT: WEBINTERFACE IS NOT STABLE! IT IS STILL IN ALPHA.
 
 ### <span style="color: red">The web interface is not compatible with CloudNet v2!</span>
 
 ## Installation
 
 #### You can find more information about the installation in the [INSTALL.md](./INSTALL.md) file.
-
-## Updating
-
-#### You can find more information about updating in the [UPDATE.md](./UPDATE.md) file.
 
 ## Projectpage
 
