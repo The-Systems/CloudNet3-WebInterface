@@ -65,6 +65,27 @@ Info: The web interface also works on an external Webspace!
     curl -sS https://getcomposer.org/installer | php
     php composer.phar install --no-dev -o
 
+## Docker
+
+For the docker setup you just need to have `docker` and `git` installed.
+
+## Close the repository
+``git clone https://github.com/The-Systems/CloudNet3-WebInterface.git``
+
+## Build the docker image
+
+``docker build -t cloudnet-webinterface .``
+
+## Run the image
+
+The interface will run on port 8080 on the host.
+
+```bash
+docker run -d --name cloudnet-webinterface \ 
+        --port 8080:80 \
+        cloudnet-webinterface
+```
+
 # GERMAN
 
 ## Vorraussetzungen
