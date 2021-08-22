@@ -69,7 +69,7 @@ Info: The web interface also works on an external Webspace!
 
 For the docker setup you just need to have `docker` and `git` installed.
 
-## Close the repository
+## Clone the repository
 ``git clone https://github.com/The-Systems/CloudNet3-WebInterface.git``
 
 ## Build the docker image
