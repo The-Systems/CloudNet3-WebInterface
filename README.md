@@ -8,7 +8,7 @@
 
 ### A Webinterface for CloudNet 3.5+
 
-## IMPORTANT: WEBINTERFACE IS NOT STABLE! IT IS STILL IN ALPHA.
+## IMPORTANT: WEBINTERFACE IS NOT STABLE! IT IS STILL IN ALPHA. ONLY FOR CLOUDNET 3.5!
 
 ### <span style="color: red">The web interface is not compatible with CloudNet v2!</span>
 
