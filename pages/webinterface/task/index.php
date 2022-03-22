@@ -5,8 +5,13 @@
                 <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
                     <!-- Tasks start -->
                     <?php
-                    $tasks = \webinterface\main::buildDefaultRequest("task", "GET");
-                    foreach ($tasks['tasks'] as $task) { ?>
+
+                    use webinterface\main;
+
+                    $tasks = main::buildDefaultRequest("tasks", "GET");
+
+
+                    foreach ($tasks as $task) { ?>
                         <div class="min-w-0 p-4 dark:bg-gray-800 bg-white rounded-lg shadow-lg">
                             <h4 class="mb-4 font-semibold text-blue-500"><?= $task['name'] ?></h4>
                             <div class="flex">
@@ -72,6 +77,8 @@
                                        class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">Show</a>
                                     <a href="/tasks/<?= $task['name']; ?>/edit"
                                        class="h-10 bg-blue-500 text-white rounded-md px-4 py-2 m-2 hover:bg-blue-600 focus:outline-none focus:shadow-outline">Edit</a>
+                                    <a href="/tasks/<?= $task['name']; ?>/delete"
+                                       class="h-10 bg-red-500 text-white rounded-md px-4 py-2 m-2 hover:bg-red-700 focus:outline-none focus:shadow-outline">Delete</a>
                                 </div>
                             </div>
                         </div>
@@ -161,7 +168,7 @@
                                                 All Nodes
                                             </option>
                                             <?php
-                                            $nodes = \webinterface\main::buildDefaultRequest("cluster", "GET");
+                                            $nodes = main::buildDefaultRequest("cluster", "GET");
                                             foreach ($nodes['nodes'] as $node) { ?>
                                                 <option class="text-sm font-mono subpixel-antialiased"><?= $node['node']['uniqueId']; ?></option>
                                             <?php } ?>

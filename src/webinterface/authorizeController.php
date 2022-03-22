@@ -29,19 +29,23 @@ class authorizeController
      * @param $password string the password associated to the provided user.
      * @return int the status of the login.
      */
-    public static function login($username, $password): int
+
+    public static function login(string $username, string $password): int
     {
         $url = main::provideUrl("auth");
         $token = base64_encode("$username:$password");
+        $curl = curl_init();
 
-        $curl = curl_init($url);
         curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_MAXREDIRS => 1,
-            CURLOPT_TIMEOUT => 5,
-            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
-                'Accept: application/json',
                 'Authorization: Basic ' . $token
             ),
         ));
@@ -57,8 +61,44 @@ class authorizeController
         $response = json_decode($response, true);
         if ($response['success'] == true) {
             // session_start();
-            $_SESSION['cn3-wi-access_token'] = $response['token'];
+            $_SESSION['cn3-wi-access_token'] = $token;
+            $_SESSION['cn3-wi-cookie'] = $response["cookie"];
 
+            return LOGIN_RESULT_SUCCESS;
+        } else {
+            return LOGIN_RESULT_INVALID_CREDENTIALS;
+        }
+    }
+
+    public static function loginToken(string $token): int
+    {
+        $url = main::provideUrl("auth");
+
+        $curl = curl_init($url);
+        curl_setopt_array($curl, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_MAXREDIRS => 1,
+            CURLOPT_TIMEOUT => 5,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                'Accept: application/json',
+                'Authorization: Basic ' . $token
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $responseHttpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+
+        if ($response === FALSE || $responseHttpCode !== 200) {
+            return LOGIN_RESULT_SERVER_DOWN;
+        }
+
+        $response = json_decode($response, true);
+        if ($response['success'] == true) {
+            // session_start();
+            $_SESSION['cn3-wi-access_token'] = $token;
             return LOGIN_RESULT_SUCCESS;
         } else {
             return LOGIN_RESULT_INVALID_CREDENTIALS;

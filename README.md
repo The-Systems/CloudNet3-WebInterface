@@ -6,9 +6,9 @@
 
 # <b>CloudNet3-Webinterface</b>
 
-### A Webinterface for CloudNet 3.5+
+### A Webinterface for CloudNet 3.x
 
-## IMPORTANT: WEBINTERFACE IS NOT STABLE! IT IS STILL IN ALPHA. ONLY FOR CLOUDNET 3.5!
+## IMPORTANT: WEBINTERFACE IS NOT STABLE!
 
 ### <span style="color: red">The web interface is not compatible with CloudNet v2!</span>
 
@@ -28,7 +28,7 @@
 
 ## License
 
-    Copyright 2021 TheSystems
+    Copyright 2022 TheSystems
     
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

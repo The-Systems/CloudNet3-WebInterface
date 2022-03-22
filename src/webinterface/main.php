@@ -68,15 +68,13 @@ class main
         return $ticket['id'];
     }
 
-    public static function buildDefaultRequest($url, $method = "POST", $headers = array(), $params = array(), $debug = false): mixed
+    public static function buildDefaultRequest($url, $method = "GET", $headers = array(), $params = array(), $debug = false): mixed
     {
         return self::buildRequest($url, $_SESSION['cn3-wi-access_token'], $method, $headers, $params, $debug);
     }
 
     public static function buildRequest($url, $token, $method = "POST", $headers = array(), $params = array(), $debug = false): mixed
     {
-        array_push($headers, 'Authorization: Bearer ' . $token);
-
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => self::provideUrl($url),
@@ -85,7 +83,11 @@ class main
             CURLOPT_TIMEOUT => 5,
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_POSTFIELDS => $params,
-            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_HTTPHEADER => array(
+                'Accept: application/json',
+                'Authorization: Basic ' . $token,
+                'Cookie: ' . $_SESSION["cn3-wi-cookie"]
+            ),
         ));
 
         $response = curl_exec($curl);
@@ -95,7 +97,7 @@ class main
             return array("success" => "false");
         }
 
-        if($debug == true){
+        if ($debug == true) {
             return $response;
         } else {
             return json_decode($response, true);

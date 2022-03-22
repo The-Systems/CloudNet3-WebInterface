@@ -24,7 +24,7 @@
                                                     <?php if ($service['configuration']['processConfig']['environment'] == "MINECRAFT_SERVER") { ?>
                                                         <div class="dark:text-gray-200 text-gray-800 text-sm"><?= $service['properties']['Motd'] ?></div>
                                                         <div class="dark:text-gray-200 text-gray-800 text-sm">
-                                                            Static: <?= ($service['configuration']['staticServer']) ? "true" : "false"; ?>
+                                                            Static: <?= ($service['configuration']['staticService']) ? "true" : "false"; ?>
                                                             |
                                                             AutoDeleteOnStop: <?= ($service['configuration']['autoDeleteOnStop']) ? "true" : "false"; ?>
                                                             |
@@ -43,7 +43,7 @@
                                                         <div class="dark:text-gray-200 text-gray-800 text-sm">
                                                             Node: <?= $service['configuration']['serviceId']['nodeUniqueId'] ?>
                                                             |
-                                                            Static: <?= ($service['configuration']['staticServer']) ? "true" : "false"; ?>
+                                                            Static: <?= ($service['configuration']['staticService']) ? "true" : "false"; ?>
                                                             |
                                                             AutoDeleteOnStop: <?= ($service['configuration']['autoDeleteOnStop']) ? "true" : "false"; ?>
                                                             |

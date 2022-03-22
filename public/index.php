@@ -31,10 +31,8 @@ if (!isset($_SESSION['cn3-wi-csrf'])) {
 
 if (isset($_SESSION['cn3-wi-access_token'])) {
     // check if token valid, and refresh
-    $result = $main::buildDefaultRequest("session/refresh");
-    if ($result['success'] === true) {
-        $_SESSION['cn3-wi-access_token'] = $result['token'];
-    } else {
+    $result = authorizeController::loginToken($_SESSION['cn3-wi-access_token']);
+    if ($result != LOGIN_RESULT_SUCCESS) {
         unset($_SESSION['cn3-wi-access_token']);
         header('Location: ' . main::getUrl());
         die();
@@ -71,7 +69,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
                             $node === "all" ? array() : array($node),
                             $startPort, isset($static), isset($autoDeleteOnStop), isset($maintenance)
                         );
-                        $response = $main::buildDefaultRequest("task", params: $taskData);
+                        $response = $main::buildDefaultRequest("tasks", "POST", params: $taskData);
 
                         if (!$response['success']) {
                             header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=duplicateTask");
@@ -89,16 +87,16 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
         });
 
         $this->any('/?', function ($task_name) use ($main) {
-            $task = main::buildDefaultRequest("task/" . $task_name, "GET", array(), array());
-            if (!$task['success']) {
+            $task = main::buildDefaultRequest("tasks/" . strtolower($task_name), "GET", array(), array());
+            if (empty($task)) {
                 header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=notFound");
                 die();
             }
 
-            $services_r = main::buildDefaultRequest("service", "GET", array(), array());
+            $services_r = main::buildDefaultRequest("services", "GET", array(), array());
             $services = array();
-            foreach ($services_r['services'] as $service) {
-                if ($service['configuration']['serviceId']['taskName'] == $task_name) {
+            foreach ($services_r as $service) {
+                if (strtolower($service['configuration']['serviceId']['taskName']) == strtolower($task_name)) {
                     array_push($services, $service);
                 }
             }
@@ -110,7 +108,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
                 }
 
                 if ($_POST['action'] == "stopService" and isset($_POST['service_id'])) {
-                    $response = $main::buildDefaultRequest("service/" . $_POST['service_id'], "DELETE");
+                    $response = $main::buildDefaultRequest("services/" . $_POST['service_id'] . "/stop", "GET");
                     header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "?action&success=true&message=stopService");
                     die();
                 }
@@ -132,25 +130,39 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
             include "../pages/footer.php";
         });
 
+        $this->any('/?/delete', function ($task_name) use ($main) {
+            $task = main::buildDefaultRequest("tasks/" . strtolower($task_name), "DELETE", array(), array());
+            header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=taskDelete");
+            die();
+        });
+
         $this->any('/?/edit', function ($task_name) use ($main) {
-            $task = main::buildDefaultRequest("task/" . $task_name, "GET", array(), array());
-            if (!$task['success']) {
+            $task = main::buildDefaultRequest("tasks/" . strtolower($task_name), "GET", array(), array());
+            if (empty($task)) {
                 header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=notFound");
                 die();
             }
 
             if (isset($_POST['action'])) {
                 if (!main::validCSRF()) {
-                    header('Location: ' . main::getUrl() . "/tasks/".$task_name."?action&success=false&message=csrfFailed");
+                    header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "?action&success=false&message=csrfFailed");
                     die();
                 }
                 // FUNCTIONS
-                if($_POST['action'] == "editTask"){
+                if ($_POST['action'] == "editTask") {
                     $name = $_POST['name'];
                     $ram = $_POST['memory'];
                     $env = $_POST['environment'];
-                    if(isset($_POST['node'])){ $node = $_POST['node']; } else { $node =  array(); }
-                    if(isset($_POST['group'])){ $group = $_POST['group']; } else { $group =  array(); }
+                    if (isset($_POST['node'])) {
+                        $node = $_POST['node'];
+                    } else {
+                        $node = array();
+                    }
+                    if (isset($_POST['group'])) {
+                        $group = $_POST['group'];
+                    } else {
+                        $group = array();
+                    }
 
                     $startPort = $_POST['port'];
                     $static = $_POST['static'];
@@ -164,13 +176,13 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
                         );
                         $response = $main::buildDefaultRequest("task", params: $taskData);
                         if (!$response['success']) {
-                            header('Location: ' . main::getUrl() . "/tasks/".$task_name."/edit?action&success=false&message=duplicateTask");
+                            header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "/edit?action&success=false&message=duplicateTask");
                             die();
                         }
-                        header('Location: ' . main::getUrl() . "/tasks/".$task_name."/edit?action&success=true");
+                        header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "/edit?action&success=true");
                         die();
                     } else {
-                        header('Location: ' . main::getUrl() . "/tasks/".$task_name."/edit?action&success=false&message=errorTask");
+                        header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "/edit?action&success=false&message=errorTask");
                     }
                 }
             }
@@ -181,16 +193,22 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
         });
 
         $this->any('/?/?/console', function ($task_name, $service_name) use ($main) {
-            $service = main::buildDefaultRequest("service/" . $service_name, "GET");
-            if (!$service['success']) {
+            $service = main::buildDefaultRequest("services/" . strtolower($service_name), "GET");
+            if (empty($service)) {
                 header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=notFound");
                 die();
             }
 
-            $ticket = main::requestWsTicket("tasks/$task_name?action&success=false&message=notFound");
-
             include "../pages/header.php";
             include "../pages/webinterface/task/console.php";
+            include "../pages/footer.php";
+        });
+    });
+
+    $route->group('/groups', function () use ($main) {
+        $this->any('/', function () use ($main) {
+            include "../pages/header.php";
+            include "../pages/webinterface/groups/index.php";
             include "../pages/footer.php";
         });
     });
@@ -264,7 +282,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
             if ($_POST['action'] == "login" and isset($_POST['username']) and isset($_POST['password'])) {
                 $action = authorizeController::login($_POST['username'], $_POST['password']);
                 if ($action == LOGIN_RESULT_SUCCESS) {
-                    header('Location: ' . main::getUrl());
+                    header('Location: ' . main::getUrl() . "/?action&success=true");
                 } else {
                     header('Location: ' . main::getUrl() . "/?action&success=false&message=loginFailed");
                 }

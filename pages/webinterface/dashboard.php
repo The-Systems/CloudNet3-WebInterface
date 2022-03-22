@@ -1,4 +1,5 @@
 <?php
+
 use webinterface\main;
 
 $nodes = main::buildDefaultRequest("cluster", "GET");
@@ -6,7 +7,10 @@ $nodes = main::buildDefaultRequest("cluster", "GET");
 $services = 0;
 
 $connectedNodeCount = 0;
-$totalNodeCount = sizeof($nodes['nodes']);
+$totalNodeCount = 0;
+if (isset($nodes['nodes'])) {
+    $totalNodeCount = sizeof($nodes['nodes']);
+}
 
 $memory_min = 0;
 $memory_max = 0;
@@ -14,10 +18,7 @@ $memory_max = 0;
 $cpu_used = 0;
 $cpu_max = 0;
 
-foreach ($nodes['nodes'] as $node) {
-    if ($node['available'] === false) {
-        continue;
-    }
+foreach ($nodes as $node) {
 
     $connectedNodeCount++;
 
@@ -42,8 +43,8 @@ foreach ($nodes['nodes'] as $node) {
                             <img src="assets/icons/cluster.png"/>
                         </div>
                         <div>
-                            <p class="mb-2 text-base font-medium text-gray-400">Connected nodes</p>
-                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $connectedNodeCount ?>/<?= $totalNodeCount ?></p>
+                            <p class="mb-2 text-base font-medium text-gray-400">Nodes</p>
+                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $connectedNodeCount ?>
                         </div>
                     </div>
                     <!-- Servers -->
@@ -63,7 +64,8 @@ foreach ($nodes['nodes'] as $node) {
                         </div>
                         <div>
                             <p class="mb-2 text-base font-medium text-gray-400">CPU</p>
-                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $cpu_used ?>%/<?= $cpu_max; ?>%</p>
+                            <p class="text-xl font-semibold dark:text-white text-gray-900"><?= $cpu_used ?>
+                                %/<?= $cpu_max; ?>%</p>
                         </div>
                     </div>
                     <!-- Ram -->
@@ -149,19 +151,19 @@ foreach ($nodes['nodes'] as $node) {
                     </div>
                     <!-- Status -->
                     <?php $version = main::testIfLatestVersion(); ?>
-                    <?php if(!$version['success']){ ?>
-                    <div class="min-w-0 p-4 text-white bg-gradient-to-br from-red-600 to-red-800 rounded-lg shadow-xs">
-                        <h4 class="mb-4 font-bold">Warning!</h4>
-                        <p>
-                            <?php if($version['response']['error_code'] == 202){ ?>
-                            Currently you are using an outdated Webinterface version (<?= $version['response']['error_extra']['current'] ?>), to keep the Webinterface up to
-                            date and
-                            to get support, update to the latest version (<?= $version['response']['error_extra']['latest'] ?>).
-                            <?php } else if($version['response']['error_code'] == 503){ ?>
-                                The TheSystems control server is currently unavailable.
-                            <?php } ?>
-                        </p>
-                    </div>
+                    <?php if (!$version['success']) { ?>
+                        <div class="min-w-0 p-4 text-white bg-gradient-to-br from-red-600 to-red-800 rounded-lg shadow-xs">
+                            <h4 class="mb-4 font-bold">Warning!</h4>
+                            <p>
+                                <?php if ($version['response']['error_code'] == 202) { ?>
+                                    Currently you are using an outdated Webinterface version (<?= $version['response']['error_extra']['current'] ?>), to keep the Webinterface up to
+                                    date and
+                                    to get support, update to the latest version (<?= $version['response']['error_extra']['latest'] ?>).
+                                <?php } else if ($version['response']['error_code'] == 503) { ?>
+                                    The TheSystems control server is currently unavailable.
+                                <?php } ?>
+                            </p>
+                        </div>
                     <?php } ?>
                 </div>
             </div>

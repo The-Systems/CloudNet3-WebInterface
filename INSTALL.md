@@ -8,7 +8,7 @@
 
 ## Requirement
 
-- CloudNet 3.5 and the Rest-Module
+- CloudNet 3.x and the Rest-Module
 
 - Webserver (or Webspace)
     - PHP 8
@@ -21,10 +21,13 @@ You can download the latest version from https://project.the-systems.eu/resource
 
 ## Installation
 
-1. Load the files into your Webserve
-2. Copy the file config/config-sample.php to config/config.php
-3. run the command "composer install" (If this doesn't work, go to "Install Composer")
-4. Setup the Webserver
+1. Delete the ```cloudnet-rest.jar in CloudNet``` Modul folder
+2. Download the modified cloudnet-rest module
+3. Restart CloudNet
+4. Load the files into your Webserve
+5. Copy the file config/config-sample.php to config/config.php
+6. run the command "composer install" (If this doesn't work, go to "Install Composer")
+7. Setup the Webserver
 
 Info: The web interface also works on an external Webspace!
 
@@ -103,10 +106,13 @@ Du kannst die aktuelle Version von https://project.the-systems.eu/resources/clou
 
 ## Installation
 
-1. Lade die Dateien auf deinen Webserver
-2. Kopiere die config/config-sample.php in config/config.php und stelle diese ein
-3. Führe "composer install" aus (Sollte das nicht funktionieren, befolge "Composer installieren")
-4. Richte den Webserver ein
+1. Lösche das ```cloudnet-rest.jar``` Modul
+2. Lade dir das modifizierte cloudnet-rest Moodul herrunter
+3. CloudNet Neustarten
+4. Lade die Dateien auf deinen Webserver
+5. Kopiere die config/config-sample.php in config/config.php und stelle diese ein
+6. Führe "composer install" aus (Sollte das nicht funktionieren, befolge "Composer installieren")
+7. Richte den Webserver ein
 
 Info: Das Webinterface funktioniert ebenfalls auf einem Externen Webserver/Webspace!
 
@@ -148,4 +154,25 @@ Info: Das Webinterface funktioniert ebenfalls auf einem Externen Webserver/Websp
 
     curl -sS https://getcomposer.org/installer | php
     php composer.phar install --no-dev -o
+
+## Docker
+
+For the docker setup you just need to have `docker` and `git` installed.
+
+## Clone the repository
+``git clone https://github.com/The-Systems/CloudNet3-WebInterface.git``
+
+## Build the docker image
+
+``docker build -t cloudnet-webinterface .``
+
+## Run the image
+
+The interface will run on port 8080 on the host.
+
+```bash
+docker run -d --name cloudnet-webinterface \ 
+        --port 8080:80 \
+        cloudnet-webinterface
+```
 

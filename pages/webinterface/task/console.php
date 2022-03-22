@@ -1,46 +1,9 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(() => {
-        let socketUrl = "<?= webinterface\main::provideSocketUrl() . "/service/" . $service_name . "/liveLog?ticket=" . $ticket; ?>";
-        let websocket = new WebSocket(socketUrl);
-
-        websocket.onerror = () => websocket.close()
-
-        websocket.onmessage = (event) => showMessage('<div class="dark:text-gray-200 text-gray-800 text-sm">' + event.data + '</div>')
-        websocket.onclose = () => showMessage('<div class="dark:text-gray-200 text-gray-800 text-sm">Connection closed by server</div>')
-
-        setInterval(() => websocket.send(''), 15_000)
-
-        // command sending
-
-        $('#execute-command').bind("click", () => pushCommandExecute(websocket))
-        $(document).on("keypress", (event) => {
-            if (event.which === 13) {
-                pushCommandExecute(websocket)
-            }
-        })
-    });
-
-    function showMessage(messageHTML) {
-        $('#socket_event')?.prepend(messageHTML);
-    }
-
-    function pushCommandExecute(websocket) {
-        let commandInput = $('#command-input')
-        let command = commandInput.val()
-
-        if (command) { // check if there is an input
-            websocket.send(command)
-            commandInput.val('') // reset input field
-        }
-    }
-</script>
-
 <main class="w-full flex-grow p-6">
     <div class="py-3">
         <main class="h-full overflow-y-auto">
             <div class="container mx-auto grid">
-                <h6 class="mb-4 font-semibold dark:text-white text-gray-900">Console for <?= $service['snapshot']['configuration']['serviceId']['taskName'] . "-" . $service['snapshot']['configuration']['serviceId']['taskServiceId'] ?></h6>
+                <h6 class="mb-4 font-semibold dark:text-white text-gray-900">Console
+                    for <?= $service['configuration']['serviceId']['taskName'] . "-" . $service['configuration']['serviceId']['taskServiceId'] ?></h6>
                 <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-1">
                     <!-- Command input -->
                     <div class="w-full">
@@ -68,12 +31,30 @@
                             <div id="socket_event"></div>
 
                             <?php
-                            $console = \webinterface\main::buildDefaultRequest("service/" . $service_name."/logLines", "GET");
-                            foreach(array_reverse($console['lines']) as $log){
-                                echo '<div class="dark:text-gray-200 text-gray-800 text-sm">'.$log.'</div>';
+                            $curl = curl_init();
+                            curl_setopt_array($curl, array(
+                                CURLOPT_URL => \webinterface\main::provideUrl("services/" . $service_name . "/log"),
+                                CURLOPT_RETURNTRANSFER => true,
+                                CURLOPT_MAXREDIRS => 10,
+                                CURLOPT_TIMEOUT => 5,
+                                CURLOPT_CUSTOMREQUEST => 'GET',
+                                CURLOPT_POSTFIELDS => '',
+                                CURLOPT_HTTPHEADER => array(
+                                    'Accept: application/json',
+                                    'Authorization: Basic ' . $_SESSION['cn3-wi-access_token'],
+                                    'Cookie: ' . $_SESSION["cn3-wi-cookie"]
+                                ),
+                            ));
+
+                            $response = curl_exec($curl);
+                            curl_close($curl);
+
+                            $newlines = preg_split("/\r\n|\n|\r/", $response);
+
+                            foreach ($newlines as $newline) {
+                                echo '<div class="dark:text-gray-200 text-gray-800 text-sm">' . $newline . '</div>';
                             }
                             ?>
-
                         </div>
                     </div>
                 </div>
