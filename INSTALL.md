@@ -17,7 +17,8 @@
 
 ## Download
 
-You can download the latest version from https://project.the-systems.eu/resources/cloudnet3-webinterface
+You can download the latest version from https://project.the-systems.eu/resources/cloudnet3-webinterface<br/>
+You can download the modul from https://github.com/The-Systems/CloudNet3-WebInterface/releases/download/1.0_alpha3/cloudnet-rest.jar
 
 ## Installation
 
@@ -102,7 +103,8 @@ docker run -d --name cloudnet-webinterface \
 
 ## Download
 
-Du kannst die aktuelle Version von https://project.the-systems.eu/resources/cloudnet3-webinterface herunterladen
+Du kannst die aktuelle Version von https://project.the-systems.eu/resources/cloudnet3-webinterface herunterladen<br/>
+Du kannst hier das Modul von https://github.com/The-Systems/CloudNet3-WebInterface/releases/download/1.0_alpha3/cloudnet-rest.jar herunterladen
 
 ## Installation
 
@@ -175,4 +177,3 @@ docker run -d --name cloudnet-webinterface \
         --port 8080:80 \
         cloudnet-webinterface
 ```
-
