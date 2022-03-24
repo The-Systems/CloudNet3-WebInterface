@@ -4,6 +4,8 @@ use webinterface\main;
 
 $nodes = main::buildDefaultRequest("cluster", "GET");
 
+$rrdata = main::buildDefaultRequest("rrdata", "GET");
+
 $services = 0;
 
 $connectedNodeCount = 0;
@@ -28,7 +30,7 @@ foreach ($nodes as $node) {
     $memory_min += $node['nodeInfoSnapshot']['usedMemory'];
 
     $cpu_max += 100;
-    $cpu_used += min(round($node['nodeInfoSnapshot']['processSnapshot']['cpuUsage'] * 100), 100);
+    $cpu_used += min(round($node['nodeInfoSnapshot']['systemCpuUsage']), 100);
 }
 ?>
 
@@ -170,3 +172,124 @@ foreach ($nodes as $node) {
         </main>
     </div>
 </main>
+<?php
+
+$cpuarraydata = "";
+$cpuarrayvalue = "";
+foreach ($rrdata["cpu"] as $cpu) {
+    $cpuarraydata = $cpuarraydata . "'" .date("h:i", (intval($cpu["time"]) / 1000)) . "',";
+    $cpuarrayvalue = $cpuarrayvalue .  intval($cpu["cpu"]) . ",";
+}
+
+$memoryarraydata = "";
+$memoryarrayvalue = "";
+foreach ($rrdata["memory"] as $memory) {
+    $memoryarraydata = $memoryarraydata . "'" .date("h:i", (intval($memory["time"]) / 1000)) . "',";
+    $memoryarrayvalue = $memoryarrayvalue .  $memory["memory"] . ",";
+}
+?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+    const linecpuConfig = {
+        type: 'line',
+        data: {
+            labels: [<?= $cpuarraydata ?>],
+            datasets: [
+                {
+                    label: 'Usage in %',
+                    backgroundColor: '#5b96f7',
+                    borderColor: '#5b96f7',
+                    data: [<?= $cpuarrayvalue ?>],
+                    fill: false,
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            legend: {
+                display: false,
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+            scales: {
+                x: {
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Value',
+                    },
+                },
+                y: {
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Value',
+                    },
+                },
+            },
+        },
+    }
+
+    const lineId = document.getElementById('cpu')
+    if (lineId !== null) {
+        window.myLine = new Chart(lineId, linecpuConfig)
+    }
+
+    const lineConfig = {
+        type: 'line',
+        data: {
+            labels: [<?= $memoryarraydata ?>],
+            datasets: [
+                {
+                    label: 'Usage in MB',
+                    backgroundColor: '#10b981',
+                    borderColor: '#10b981',
+                    data: [<?= $memoryarrayvalue ?>],
+                    fill: false,
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            legend: {
+                display: false,
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true,
+            },
+            scales: {
+                x: {
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Value',
+                    },
+                },
+                y: {
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Value',
+                    },
+                },
+            },
+        },
+    }
+
+    const lineCtx = document.getElementById('ram')
+    if (lineCtx !== null) {
+        window.myLine = new Chart(lineCtx, lineConfig)
+    }
+</script>

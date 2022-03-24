@@ -113,12 +113,14 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
                     die();
                 }
 
-                if ($_POST['action'] == "startService" and isset($_POST['count'])) {
-                    $i = $_POST['count'];
-                    while ($i != 0) {
-                        $i -= 1;
-                        $response = $main::buildDefaultRequest("service/create", params: json_encode(array("start" => isset($_POST['start']), "serviceTaskName" => $task_name)));
-                    }
+                if ($_POST['action'] == "createService" and isset($_POST['count'])) {
+                    $main::buildDefaultRequest("services/" . strtolower($task_name) . "/" . $_POST['count'] . "/" . (isset($_POST['start']) ? "true" : "false"), "GET");
+                    header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "?action&success=true&message=createService");
+                    die();
+                }
+
+                if ($_POST['action'] == "startService" and isset($_POST['service_id'])) {
+                    $main::buildDefaultRequest("services/" . $_POST['service_id'] . '/start', "GET");
 
                     header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "?action&success=true&message=startService");
                     die();
@@ -174,11 +176,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
                             $name, $ram, $env, $node,
                             $startPort, isset($static), isset($autoDeleteOnStop), isset($maintenance), $group
                         );
-                        $response = $main::buildDefaultRequest("task", params: $taskData);
-                        if (!$response['success']) {
-                            header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "/edit?action&success=false&message=duplicateTask");
-                            die();
-                        }
+                        $main::buildDefaultRequest("tasks", "POST", $taskData);
                         header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "/edit?action&success=true");
                         die();
                     } else {
@@ -197,6 +195,19 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
             if (empty($service)) {
                 header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=notFound");
                 die();
+            }
+
+            if (isset($_POST['action'])) {
+                if (!main::validCSRF()) {
+                    header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "?action&success=false&message=csrfFailed");
+                    die();
+                }
+
+                if ($_POST['action'] == "sendCommand" and isset($_POST['command'])) {
+                    $response = $main::buildDefaultRequest("services/" . $_POST['service_id'] . "/stop", "GET");
+                    header('Location: ' . main::getUrl() . "/tasks/" . $task_name . "?action&success=true&message=stopService");
+                    die();
+                }
             }
 
             include "../pages/header.php";
@@ -260,6 +271,42 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
             include "../pages/header.php";
             include "../pages/webinterface/cluster/console.php";
+            include "../pages/footer.php";
+        });
+    });
+
+    $app->route->group('/modules', function () use ($main) {
+        $this->any('/', function () use ($main) {
+            include "../pages/header.php";
+            include "../pages/webinterface/modules/index.php";
+            include "../pages/footer.php";
+        });
+    });
+
+    $app->route->group('/players', function () use ($main) {
+        $this->any('/', function () use ($main) {
+            include "../pages/header.php";
+            include "../pages/webinterface/players/index.php";
+            include "../pages/footer.php";
+        });
+    });
+
+    $app->route->group('/profile', function () use ($main) {
+        $this->any('/', function () use ($main) {
+            include "../pages/header.php";
+            include "../pages/webinterface/profile/index.php";
+            include "../pages/footer.php";
+        });
+
+        $this->any('/help', function () use ($main) {
+            include "../pages/header.php";
+            include "../pages/webinterface/profile/help.php";
+            include "../pages/footer.php";
+        });
+
+        $this->any('/settings', function () use ($main) {
+            include "../pages/header.php";
+            include "../pages/webinterface/profile/settings.php";
             include "../pages/footer.php";
         });
     });

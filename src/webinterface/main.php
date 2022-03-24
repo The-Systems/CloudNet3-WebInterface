@@ -68,12 +68,12 @@ class main
         return $ticket['id'];
     }
 
-    public static function buildDefaultRequest($url, $method = "GET", $headers = array(), $params = array(), $debug = false): mixed
+    public static function buildDefaultRequest($url, $method = "GET", $params = array(), $debug = false): mixed
     {
-        return self::buildRequest($url, $_SESSION['cn3-wi-access_token'], $method, $headers, $params, $debug);
+        return self::buildRequest($url, $_SESSION['cn3-wi-access_token'], $method, $params, $debug);
     }
 
-    public static function buildRequest($url, $token, $method = "POST", $headers = array(), $params = array(), $debug = false): mixed
+    public static function buildRequest($url, $token, $method = "POST", $params = array(), $debug = false): mixed
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(

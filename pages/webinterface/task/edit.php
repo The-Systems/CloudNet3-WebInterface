@@ -95,7 +95,7 @@
                                                 </option>
                                                 <?php
                                                 $nodes = \webinterface\main::buildDefaultRequest("cluster", "GET");
-                                                foreach ($nodes['nodes'] as $node) { ?>
+                                                foreach ($nodes as $node) { ?>
                                                     <option class="text-sm font-mono subpixel-antialiased" <?php if(in_array($node['node']['uniqueId'], $task['task']['associatedNodes'])) echo "selected"; ?>
                                                     ><?= $node['node']['uniqueId']; ?></option>
                                                 <?php } ?>
@@ -114,8 +114,8 @@
                                                     Select Group
                                                 </option>
                                                 <?php
-                                                $groups = \webinterface\main::buildDefaultRequest("group", "GET");
-                                                foreach ($groups['groups'] as $group) { ?>
+                                                $groups = \webinterface\main::buildDefaultRequest("groups", "GET");
+                                                foreach ($groups as $group) { ?>
                                                     <option class="text-sm font-mono subpixel-antialiased" <?php if(in_array($group['name'], $task['task']['groups'])) echo "selected"; ?>
                                                     ><?= $group['name']; ?></option>
                                                 <?php } ?>

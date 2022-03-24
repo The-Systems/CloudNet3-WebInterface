@@ -63,6 +63,7 @@ class authorizeController
             // session_start();
             $_SESSION['cn3-wi-access_token'] = $token;
             $_SESSION['cn3-wi-cookie'] = $response["cookie"];
+            $_SESSION['cn3-wi-user'] = $response["userUniqueId"];
 
             return LOGIN_RESULT_SUCCESS;
         } else {

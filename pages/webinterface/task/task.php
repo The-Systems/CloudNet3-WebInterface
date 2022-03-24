@@ -22,7 +22,7 @@
                                                         on <?= $service['configuration']['serviceId']['nodeUniqueId'] ?>
                                                         | <?= $service['address']['host'] . ":" . $service['address']['port']; ?></div>
                                                     <?php if ($service['configuration']['processConfig']['environment'] == "MINECRAFT_SERVER") { ?>
-                                                        <div class="dark:text-gray-200 text-gray-800 text-sm"><?= $service['properties']['Motd'] ?></div>
+                                                        <div class="dark:text-gray-200 text-gray-800 text-sm"><?= $service['properties'] != null ? $service['properties']['Motd'] : "" ?></div>
                                                         <div class="dark:text-gray-200 text-gray-800 text-sm">
                                                             Static: <?= ($service['configuration']['staticService']) ? "true" : "false"; ?>
                                                             |
@@ -59,7 +59,7 @@
                                                         </div>
                                                     <?php } ?>
                                                 </div>
-                                                <div class="dark:text-gray-200 text-gray-800 text-xs"><?= $service['properties']['Online-Count'] . "/" . $service['properties']['Max-Players'] ?></div>
+                                                <div class="dark:text-gray-200 text-gray-800 text-xs"><?= ($service['properties'] != null ? $service['properties']['Online-Count'] : "0") . "/" . ($service['properties'] != null ? $service['properties']['Max-Players'] : "0") ?></div>
 
                                                 <?php if ($service['lifeCycle'] == "RUNNING") { ?>
                                                     <div class="flex flex-col rounded-md w-4 h-4 justify-center items-center mx-3 mr-4">
