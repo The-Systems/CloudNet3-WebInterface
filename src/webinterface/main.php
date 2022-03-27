@@ -73,7 +73,7 @@ class main
         return self::buildRequest($url, $_SESSION['cn3-wi-access_token'], $method, $params, $debug);
     }
 
-    public static function buildRequest($url, $token, $method = "POST", $params = array(), $debug = false): mixed
+    public static function buildRequest($url, $token, $method = "POST", $params = array(),$debug = false): mixed
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -106,7 +106,7 @@ class main
 
     public static function getMessage($key)
     {
-        $file = dirname(__FILE__) . "/../../config/message.json";
+        $file = BASE_PATH . '../../config/messages.json';
         $json = file_get_contents($file);
         $message = json_decode($json, true);
         if (isset($message[$key])) {

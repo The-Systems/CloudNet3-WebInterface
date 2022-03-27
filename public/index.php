@@ -14,7 +14,7 @@ require fileController::getVersionFilePath();
 require fileController::getConfigurationPath();
 
 // create instance of main controller
-$main = new main($config, $version);
+$main = new main($config, $version,);
 
 // create app route controller
 $app = System\App::instance();
@@ -40,6 +40,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
     $route->any('/', function () use ($main) {
         include "../pages/header.php";
+        include "../pages/action-modal.php";
         include "../pages/webinterface/dashboard.php";
         include "../pages/footer.php";
     });
@@ -71,17 +72,14 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
                         );
                         $response = $main::buildDefaultRequest("tasks", "POST", params: $taskData);
 
-                        if (!$response['success']) {
-                            header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=duplicateTask");
-                            die();
-                        }
-                        header('Location: ' . main::getUrl() . "/tasks?action&success=true");
+                        header('Location: ' . main::getUrl() . "/tasks?action&success=true&message=taskCreated");
                         die();
                     }
                 }
             }
 
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/task/index.php";
             include "../pages/footer.php";
         });
@@ -89,7 +87,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
         $this->any('/?', function ($task_name) use ($main) {
             $task = main::buildDefaultRequest("tasks/" . strtolower($task_name), "GET", array(), array());
             if (empty($task)) {
-                header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=notFound");
+                header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=notFoundTask");
                 die();
             }
 
@@ -128,13 +126,14 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
             }
 
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/task/task.php";
             include "../pages/footer.php";
         });
 
         $this->any('/?/delete', function ($task_name) use ($main) {
             $task = main::buildDefaultRequest("tasks/" . strtolower($task_name), "DELETE", array(), array());
-            header('Location: ' . main::getUrl() . "/tasks?action&success=false&message=taskDelete");
+            header('Location: ' . main::getUrl() . "/tasks?action&success=true&message=taskDelete");
             die();
         });
 
@@ -186,6 +185,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
             }
 
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/task/edit.php";
             include "../pages/footer.php";
         });
@@ -211,6 +211,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
             }
 
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/task/console.php";
             include "../pages/footer.php";
         });
@@ -218,7 +219,19 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
     $route->group('/groups', function () use ($main) {
         $this->any('/', function () use ($main) {
+
+            if (isset($_POST['action'])) {
+                if (!main::validCSRF()) {
+                    header('Location: ' . main::getUrl() . "/cluster?action&success=false&message=csrfFailed");
+                    die();
+                }
+
+                if ($_POST["action"] == "createGroup") {
+                    $response = $main::buildDefaultRequest("groups", "POST");
+                }
+            }
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/groups/index.php";
             include "../pages/footer.php";
         });
@@ -256,6 +269,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
             }
 
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/cluster/index.php";
             include "../pages/footer.php";
         });
@@ -270,6 +284,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
             $ticket = main::requestWsTicket("cluster?action&success=false&message=notFound");
 
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/cluster/console.php";
             include "../pages/footer.php";
         });
@@ -278,6 +293,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
     $app->route->group('/modules', function () use ($main) {
         $this->any('/', function () use ($main) {
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/modules/index.php";
             include "../pages/footer.php";
         });
@@ -286,7 +302,104 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
     $app->route->group('/players', function () use ($main) {
         $this->any('/', function () use ($main) {
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/players/index.php";
+            include "../pages/footer.php";
+        });
+    });
+
+    $app->route->group('/players', function () use ($main) {
+        $this->any('/', function () use ($main) {
+            include "../pages/header.php";
+            include "../pages/action-modal.php";
+            include "../pages/webinterface/players/index.php";
+            include "../pages/footer.php";
+        });
+
+        $this->any('/?', function ($uuid) use ($main) {
+            if (isset($_POST["action"])) {
+                if (!main::validCSRF()) {
+                    header('Location: ' . main::getUrl() . "/players/" . $uuid . "?action&success=false&message=csrfFailed");
+                    die();
+                }
+
+                if ($_POST["action"] == "addGroup") {
+                    main::buildDefaultRequest("players/" . $uuid . "/add", 'PUT', json_encode(array("group" => $_POST["permissionGroup"], "time" => $_POST["time"], "time_number" => $_POST["time_number"])));
+                    header('Location: ' . main::getUrl() . "/players/" . $uuid . "?action&success=true&message=addGroupToPlayer");
+                    die();
+                }
+
+                if ($_POST["action"] == "deleteGroup") {
+                    main::buildDefaultRequest("players/" . $uuid . "/remove", 'PUT', json_encode(array("group" => $_POST["groupName"])));
+                    header('Location: ' . main::getUrl() . "/players/" . $uuid . "?action&success=true&message=deleteGroupFromPlayer");
+                    die();
+                }
+
+                if ($_POST["action"] == "addPermission") {
+                    main::buildDefaultRequest("players/" . $uuid . "/add", 'PUT', $_POST["serviceGroup"] == "all" ?
+                        json_encode(array("permission" => $_POST["permission"], "serviceGroup" => $_POST["serviceGroup"])) :
+                        json_encode(array("permission" => $_POST["permission"])));
+                    header('Location: ' . main::getUrl() . "/players/" . $uuid . "?action&success=true&message=addPermissionFromPlayer");
+                    die();
+                }
+
+                if ($_POST["action"] == "deletePermission") {
+                    main::buildDefaultRequest("players/" . $uuid . "/remove", 'PUT', json_encode(array("permission" => $_POST["permission"])));
+                    header('Location: ' . main::getUrl() . "/players/" . $uuid . "?action&success=true&message=deletePermissionFromPlayer");
+                    die();
+                }
+            }
+
+            include "../pages/header.php";
+            include "../pages/action-modal.php";
+            include "../pages/webinterface/players/show.php";
+            include "../pages/footer.php";
+        });
+    });
+
+    $app->route->group('/permissions', function () use ($main) {
+        $this->any('/', function () use ($main) {
+            include "../pages/header.php";
+            include "../pages/action-modal.php";
+            include "../pages/webinterface/permissions/index.php";
+            include "../pages/footer.php";
+        });
+
+        $this->any('/?', function ($group_name) use ($main) {
+            if (isset($_POST["action"])) {
+                if (!main::validCSRF()) {
+                    header('Location: ' . main::getUrl() . "/permissions/" . $group_name . "?action&success=false&message=csrfFailed");
+                    die();
+                }
+
+                if ($_POST["action"] == "groupSettings") {
+                    main::buildDefaultRequest("permissions", "PUT", json_encode(array("name" => $_POST["groupName"], "defaultGroup" => isset($_POST["defaultGroup"]), "edit_name" => $_POST["name"], "prefix" => $_POST["prefix"], "display" => $_POST["display"], "color" => $_POST["color"], "suffix" => $_POST["suffix"], "sortId" => $_POST["sortId"])));
+                    header('Location: ' . main::getUrl() . "/permissions/" . $group_name . "?action&success=true&message=updatePermissionGroup");
+                    die();
+                }
+
+                if ($_POST["action"] == "deletePermission") {
+                    main::buildDefaultRequest("permissions/permission/delete", "POST", json_encode(array("permission" => $_POST["permissionName"], "groupName" => $group_name)));
+                    header('Location: ' . main::getUrl() . "/permissions/" . $group_name . "?action&success=true&message=deletePermission");
+                    die();
+                }
+
+                if ($_POST["action"] == "deleteGroup") {
+                    main::buildDefaultRequest("permissions/group/delete", "POST", json_encode(array("name" => $_POST["groupName"], "groupName" => $group_name)));
+                    header('Location: ' . main::getUrl() . "/permissions/" . $group_name . "?action&success=true&message=deleteGroupFromGroup");
+                    die();
+                }
+
+                if ($_POST["action"] == "addPermission") {
+                    main::buildDefaultRequest("permissions/permission/add", "POST", json_encode(array("permission" => $_POST["name"], "groupName" => $group_name)));
+                    header('Location: ' . main::getUrl() . "/permissions/" . $group_name . "?action&success=true&message=addPermission");
+                    die();
+                }
+
+            }
+            include "../pages/header.php";
+            include "../pages/action-modal.php";
+            include "../pages/webinterface/permissions/show.php";
             include "../pages/footer.php";
         });
     });
@@ -294,18 +407,21 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
     $app->route->group('/profile', function () use ($main) {
         $this->any('/', function () use ($main) {
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/profile/index.php";
             include "../pages/footer.php";
         });
 
         $this->any('/help', function () use ($main) {
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/profile/help.php";
             include "../pages/footer.php";
         });
 
         $this->any('/settings', function () use ($main) {
             include "../pages/header.php";
+            include "../pages/action-modal.php";
             include "../pages/webinterface/profile/settings.php";
             include "../pages/footer.php";
         });
@@ -329,7 +445,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
             if ($_POST['action'] == "login" and isset($_POST['username']) and isset($_POST['password'])) {
                 $action = authorizeController::login($_POST['username'], $_POST['password']);
                 if ($action == LOGIN_RESULT_SUCCESS) {
-                    header('Location: ' . main::getUrl() . "/?action&success=true");
+                    header('Location: ' . main::getUrl());
                 } else {
                     header('Location: ' . main::getUrl() . "/?action&success=false&message=loginFailed");
                 }
@@ -338,6 +454,7 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
         }
 
         include "../pages/small-header.php";
+        include "../pages/action-modal.php";
         include "../pages/webinterface/login.php";
         include "../pages/footer.php";
     });
