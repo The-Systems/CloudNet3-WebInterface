@@ -337,8 +337,8 @@ if (isset($_SESSION['cn3-wi-access_token'])) {
 
                 if ($_POST["action"] == "addPermission") {
                     main::buildDefaultRequest("players/" . $uuid . "/add", 'PUT', $_POST["serviceGroup"] == "all" ?
-                        json_encode(array("permission" => $_POST["permission"], "serviceGroup" => $_POST["serviceGroup"])) :
-                        json_encode(array("permission" => $_POST["permission"])));
+                        json_encode(array("permission" => $_POST["permission"])) :
+                        json_encode(array("permission" => $_POST["permission"], "serviceGroup" => $_POST["serviceGroup"])));
                     header('Location: ' . main::getUrl() . "/players/" . $uuid . "?action&success=true&message=addPermissionFromPlayer");
                     die();
                 }
